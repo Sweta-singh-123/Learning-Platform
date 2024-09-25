@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>LearnEd</title>
+    <script src="https://code.jquery.com/jquery-2.2.4.js" integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI=" crossorigin="anonymous"></script>
+     <%- include('bootstrap') %>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+</head>
+
+<body>
+
+    <h1 style="text-align:center">Login to LearnEd</h1>
+    <div class="container mt-5 p-4 shadow-lg" style="width: 20em;">
+        <form id="loginForm" action="/login" method="post" onsubmit="user(event)">
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" placeholder="abc123@xyz.com" name="email" id="email" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" name="pwd" id="password" placeholder="Password" required>
+                </div>
+            </div>
+
+            <button class="btn btn-success mb-2" style="margin-left:40%" type="submit">Login</button>
+            <br>
+        </form>
+        <a href="/register">Don't have an account?</a>
+    </div>
+  
+
+    <script>
+        window.location.hash = "no-back-button";
+        window.location.hash = "Again-No-back-button";
+        window.onhashchange = function () {
+            window.location.hash = "no-back-button";
+        }
+    </script>
+    <script>
+        function user(event) {
+            event.preventDefault();
+            var email = document.getElementById("email").value;
+            var pwd = document.getElementById("password").value;
+
+            axios.post("/login", {
+                    email,
+                    pwd
+                })
+                .then((res) => {
+                    if (res.data.success === "success") {
+                        makeAlert1();
+                        document.getElementById("loginForm").reset();
+                    } else if (res.data.error === "empty") {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Fill Empty Fields',
+                        })
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Invalid Credentials!',
+                        })
+                    }
+                })
+        }
+
+        function makeAlert1() {
+            let timerInterval
+            Swal.fire({
+                icon: 'success',
+                title: '<h2>Good job!</h2>',
+                html: '<h3>Login Successfully</h3>',
+                timer: 1000,
+                timerProgressBar: true,
+                onBeforeOpen: () => {
+                    Swal.showLoading()
+                    timerInterval = setInterval(() => {
+                        Swal.getContent().querySelector('b')
+                            .textContent = Swal.getTimerLeft()
+                    }, 100)
+                },
+                onClose: () => {
+                    clearInterval(timerInterval)
+                    location.replace("/user");
+                }
+            }).then((result) => {
+                if (
+                    result.dismiss === Swal.DismissReason.timer
+                ) {
+                    console.log('I was closed by the timer')
+                }
+            })
+        }
+    </script>
+
+</body>
+
+</html>
